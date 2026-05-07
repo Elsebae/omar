@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omar & Doha 💕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #09060a;
+      --bg2:       #110d14;
+      --bg3:       #1a1320;
+      --rose:      #e8a4b0;
+      --rose-dim:  #c4788a;
+      --gold:      #c9a96e;
+      --gold-dim:  #9e7d4e;
+      --text:      #f2e8e4;
+      --text-dim:  #a89490;
+      --border:    rgba(232,164,176,0.15);
+      --fd: 'Cormorant Garamond', Georgia, serif;
+      --fb: 'DM Sans', sans-serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      font-weight: 300;
+      cursor: none;
+    }
+
+    .cursor {
+      position: fixed; width: 8px; height: 8px;
+      background: var(--rose); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      position: fixed; width: 32px; height: 32px;
+      border: 1px solid rgba(232,164,176,.4);
+      border-radius: 50%; pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width .3s var(--ease), height .3s var(--ease);
+    }
+
+    #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .pt { position: absolute; bottom: -20px; opacity: 0; animation: rise linear infinite; }
+    @keyframes rise {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      8%   { opacity: .5; }
+      92%  { opacity: .2; }
+      100% { transform: translateY(-108vh) rotate(22deg); opacity: 0; }
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: .022; pointer-events: none;
+    }
+
+    #music-pill {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: rgba(17,13,20,.85);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 10px 20px 10px 14px;
+      display: flex; align-items: center; gap: 12px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      cursor: pointer;
+      transition: transform .3s var(--ease), box-shadow .3s;
+      user-select: none;
+    }
+    #music-pill:hover { transform: translateX(-50%) scale(1.04); box-shadow: 0 12px 40px rgba(0,0,0,.6); }
+    .pill-disc {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--rose-dim), var(--gold-dim));
+      display: grid; place-items: center; font-size: 15px;
+      animation: spin 9s linear infinite paused;
+    }
+    .pill-disc.playing { animation-play-state: running; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pill-info { display: flex; flex-direction: column; gap: 2px; }
+    .pill-title { font-family: var(--fd); font-size: .95rem; font-weight: 400; color: var(--text); white-space: nowrap; }
+    .pill-artist { font-size: .68rem; color: var(--text-dim); letter-spacing: 1px; white-space: nowrap; }
+    .pill-btn {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(232,164,176,.15); border: 1px solid var(--border);
+      color: var(--rose); font-size: 12px; cursor: pointer;
+      display: grid; place-items: center; transition: background .2s;
+    }
+    .pill-btn:hover { background: rgba(232,164,176,.28); }
+
+    @media(max-width:700px){
+      /* Pill becomes a tiny circular button — no text, sits bottom-right */
+      #music-pill {
+        bottom: 18px; top: auto;
+        left: auto; right: 18px;
+        transform: none;
+        padding: 8px;
+        gap: 0;
+        border-radius: 50%;
+        width: 44px; height: 44px;
+        justify-content: center;
+      }
+      #music-pill:hover { transform: scale(1.08); }
+      .pill-info { display: none; }
+      .pill-disc { width: 26px; height: 26px; font-size: 12px; }
+      .pill-btn { display: none; }
+    }
+
+    #nav-dots {
+      position: fixed; right: 24px; top: 50%;
+      transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 10px; z-index: 10;
+    }
+    .ndot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(232,164,176,.2); cursor: pointer; border: none;
+      transition: background .4s, transform .4s;
+    }
+    .ndot.on { background: var(--rose); transform: scale(1.6); }
+
+    #nav-arrows {
+      position: fixed; right: 17px; bottom: 110px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 10;
+    }
+    .nav-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(232,164,176,.07);
+      border: 1px solid var(--border);
+      color: var(--rose); font-size: 14px; cursor: pointer;
+      display: grid; place-items: center; transition: background .3s;
+    }
+    .nav-btn:hover { background: rgba(232,164,176,.18); }
+    @media(max-width:700px){ #nav-arrows { bottom: 60px; right: 12px; } }
+
+    #pages { position: fixed; inset: 0; z-index: 2; }
+
+    .page {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 32px; text-align: center;
+      opacity: 0; pointer-events: none;
+      will-change: opacity, transform;
+    }
+    .page.active { opacity: 1; pointer-events: all; }
+
+    /* HERO */
+    .p1-glow { position: absolute; border-radius: 50%; pointer-events: none; }
+    .p1-glow.g1 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(200,100,120,.13) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: gp 4s ease-in-out infinite;
+    }
+    .p1-glow.g2 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(201,169,110,.09) 0%, transparent 70%);
+      top: 18%; right: 8%; animation: gp2 6s 1s ease-in-out infinite;
+    }
+    @keyframes gp  { 0%,100%{opacity:.8;transform:translate(-50%,-50%) scale(1)} 50%{opacity:1;transform:translate(-50%,-50%) scale(1.14)} }
+    @keyframes gp2 { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+
+    .p1-eye { font-size:.68rem; letter-spacing:6px; text-transform:uppercase; color:var(--gold); font-weight:400; margin-bottom:28px; position:relative; }
+    .p1-names { font-family:var(--fd); font-size:clamp(4.5rem,14vw,9.5rem); font-weight:300; line-height:.88; letter-spacing:-3px; position:relative; }
+    .p1-names em { font-style:italic; color:var(--rose); display:block; }
+    .p1-amp { font-family:var(--fd); font-size:clamp(2rem,5vw,3.5rem); color:var(--gold); font-weight:300; display:block; margin:10px 0; }
+    .p1-sub { margin-top:36px; font-size:.82rem; letter-spacing:3px; color:var(--text-dim); position:relative; }
+    .p1-hint { margin-top:44px; font-size:.66rem; letter-spacing:3px; text-transform:uppercase; color:rgba(232,164,176,.35); animation:blink 2.2s ease-in-out infinite; position:relative; }
+    @keyframes blink { 0%,100%{opacity:.35} 50%{opacity:.85} }
+
+    .eyebrow { font-size:.65rem; letter-spacing:5px; text-transform:uppercase; color:var(--gold); font-weight:400; margin-bottom:32px; }
+
+    /* PHOTO PAGES */
+    .photo-page { flex-direction:row; gap:64px; padding:60px 80px; text-align:left; }
+    @media(max-width:700px){ .photo-page { flex-direction:column; padding:50px 24px 60px; text-align:center; gap:14px; } }
+
+    .photo-frame {
+      flex:0 0 auto; width:min(300px,40vw); aspect-ratio:3/4;
+      border-radius:20px; overflow:hidden;
+      border:1px solid var(--border); background:var(--bg3); position:relative;
+    }
+    @media(max-width:700px){ .photo-frame { width:100%; max-width:200px; margin:0 auto; aspect-ratio:4/3; } }
+    .photo-frame img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .6s var(--ease); }
+    .photo-frame:hover img { transform:scale(1.04); }
+    .ph-empty {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    }
+    .ph-empty span:first-child { font-size:38px; opacity:.2; }
+    .ph-empty span:last-child  { font-size:.68rem; letter-spacing:2px; text-transform:uppercase; color:var(--text-dim); opacity:.4; }
+    .ph-num { position:absolute; top:14px; left:16px; font-family:var(--fd); font-size:.8rem; font-style:italic; color:rgba(232,164,176,.45); }
+
+    .photo-copy { flex:1; display:flex; flex-direction:column; justify-content:center; }
+    .photo-copy .eyebrow { text-align:inherit; }
+    .photo-q { font-family:var(--fd); font-size:clamp(1.5rem,2.8vw,2.4rem); font-weight:300; font-style:italic; line-height:1.25; color:var(--text); margin-bottom:18px; }
+    .photo-q em { color:var(--rose); font-style:normal; }
+    .photo-hr { width:48px; height:1px; background:linear-gradient(to right,var(--rose-dim),transparent); margin:0 0 16px; }
+    @media(max-width:700px){ .photo-hr { margin:0 auto 10px; } }
+    .photo-note { font-size:.82rem; color:var(--text-dim); line-height:1.9; max-width:340px; }
+    @media(max-width:700px){
+      .photo-note { margin:0 auto; font-size:.74rem; line-height:1.65; }
+      .photo-q { font-size:1.35rem; margin-bottom:10px; }
+      .eyebrow { margin-bottom:10px; }
+    }
+
+    /* LETTER */
+    .letter-wrap { width:min(680px,90vw); text-align:left; overflow-y:auto; max-height:85vh; }
+    .letter-wrap::-webkit-scrollbar { width:3px; }
+    .letter-wrap::-webkit-scrollbar-thumb { background:rgba(232,164,176,.2); border-radius:99px; }
+    .letter-card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:24px; padding:52px 52px 44px; position:relative; overflow:hidden;
+    }
+    @media(max-width:600px){ .letter-card { padding:32px 24px 28px; } }
+    .letter-card::before {
+      content:'"'; position:absolute; top:-24px; left:28px;
+      font-family:var(--fd); font-size:18rem; line-height:1;
+      color:rgba(232,164,176,.04); pointer-events:none; font-weight:600;
+    }
+    .letter-date { font-size:.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:26px; font-weight:400; }
+    .letter-body { font-family:var(--fd); font-size:clamp(.98rem,2.2vw,1.18rem); line-height:1.95; font-weight:300; color:var(--text); }
+    .letter-body p { margin-bottom:18px; }
+    .letter-body p:last-child { margin-bottom:0; }
+    .letter-body em { font-style:italic; color:var(--rose); }
+    .letter-sign { margin-top:38px; padding-top:26px; border-top:1px solid var(--border); font-family:var(--fd); font-size:1.45rem; font-style:italic; font-weight:300; color:var(--rose-dim); }
+
+    /* FINALE */
+    .finale-ring {
+      position:absolute; border-radius:50%; pointer-events:none;
+      width:500px; height:500px;
+      background:radial-gradient(circle,rgba(200,100,120,.1) 0%,transparent 65%);
+      top:50%; left:50%; transform:translate(-50%,-50%);
+      animation:gp 4s ease-in-out infinite;
+    }
+    .finale-heart { font-size:4rem; animation:hb 1.8s ease-in-out infinite; display:block; margin-bottom:28px; position:relative; }
+    @keyframes hb { 0%,100%{transform:scale(1)} 14%{transform:scale(1.22)} 28%{transform:scale(1)} 42%{transform:scale(1.12)} 70%{transform:scale(1)} }
+    .finale-names { font-family:var(--fd); font-size:clamp(2.5rem,8vw,5.5rem); font-weight:300; font-style:italic; color:var(--rose); line-height:1; margin-bottom:18px; position:relative; }
+    .finale-sub { font-size:.78rem; letter-spacing:4px; text-transform:uppercase; color:var(--text-dim); margin-bottom:44px; position:relative; }
+    .finale-days { font-family:var(--fd); font-size:clamp(2rem,5vw,3.5rem); font-weight:300; color:var(--gold); margin-bottom:6px; position:relative; }
+    .finale-label { font-size:.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--text-dim); position:relative; }
+
+    /* START OVERLAY */
+    #start-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 32px;
+      text-align: center; padding: 40px;
+      transition: opacity .8s var(--ease);
+    }
+    #start-overlay.hidden { opacity: 0; pointer-events: none; }
+    .start-title { font-family: var(--fd); font-size: clamp(2rem,6vw,3.5rem); font-weight:300; font-style:italic; color:var(--rose); }
+    .start-sub { font-size:.78rem; letter-spacing:3px; text-transform:uppercase; color:var(--text-dim); }
+    .start-btn {
+      padding: 14px 36px; border-radius: 99px;
+      background: linear-gradient(135deg, var(--rose-dim), var(--rose));
+      border: none; color: #fff; font-family: var(--fb); font-size: .85rem;
+      letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+      transition: transform .2s var(--ease), box-shadow .3s;
+      box-shadow: 0 0 0 rgba(232,164,176,0);
+    }
+    .start-btn:hover { transform: scale(1.06); box-shadow: 0 0 32px rgba(232,164,176,.35); }
+
+    #pause-badge {
+      position: fixed; top: 16px; right: 16px; z-index: 20;
+      font-size: .62rem; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(232,164,176,.45); opacity: 0;
+      transition: opacity .4s; pointer-events: none;
+    }
+    #pause-badge.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <div id="start-overlay">
+    <span style="font-size:3rem">💕</span>
+    <h1 class="start-title">Omar &amp; Doha</h1>
+    <p class="start-sub">A love story — with music</p>
+    <button class="start-btn" id="startBtn">Begin ❤️</button>
+  </div>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cring"></div>
+  <div id="particles"></div>
+  <div id="pause-badge">⏸ paused</div>
+
+  <div id="music-pill">
+    <div class="pill-disc" id="pillDisc">🎵</div>
+    <div class="pill-info">
+      <span class="pill-title">مليش بعدك</span>
+      <span class="pill-artist">تامر حسني</span>
+    </div>
+    <button class="pill-btn" id="pillBtn">&#9646;&#9646;</button>
+  </div>
+
+  <div id="nav-dots"></div>
+
+  <div id="nav-arrows">
+    <button class="nav-btn" id="btnPrev" disabled>&#8593;</button>
+    <button class="nav-btn" id="btnNext">&#8595;</button>
+  </div>
+
+  <div id="pages">
+
+    <!-- 1 – HERO -->
+    <div class="page active" data-page="0">
+      <div class="p1-glow g1"></div>
+      <div class="p1-glow g2"></div>
+      <p class="p1-eye">A message from the heart</p>
+      <h1 class="p1-names">
+        Omar
+        <span class="p1-amp">&amp;</span>
+        <em>Doha</em>
+      </h1>
+      <p class="p1-sub">Some things are worth fighting for &nbsp;—&nbsp; you are one of them</p>
+      <p class="p1-hint">plays automatically &nbsp;·&nbsp; swipe or tap arrows to navigate</p>
+    </div>
+
+    <!-- 2 – PHOTO 1 -->
+    <div class="page photo-page" data-page="1">
+      <div class="photo-frame">
+        <img src="photo1.jpg" alt="Photo 1" onerror="this.style.display='none'" />
+        <div class="ph-empty"><span>📷</span><span>Photo 1</span></div>
+        <span class="ph-num">01 / 06</span>
+      </div>
+      <div class="photo-copy">
+        <p class="eyebrow">Since the very first day</p>
+        <h2 class="photo-q">You changed<br>my whole <em>world</em></h2>
+        <div class="photo-hr"></div>
+        <p class="photo-note">Before you, I didn't know what it felt like to have someone who truly sees you. The moment I met you, everything shifted — and I never want to go back to the person I was before you walked in.</p>
+      </div>
+    </div>
+
+    <!-- 3 – PHOTO 2 -->
+    <div class="page photo-page" data-page="2">
+      <div class="photo-frame">
+        <img src="photo2.jpg" alt="Photo 2" onerror="this.style.display='none'" />
+        <div class="ph-empty"><span>📷</span><span>Photo 2</span></div>
+        <span class="ph-num">02 / 06</span>
+      </div>
+      <div class="photo-copy">
+        <p class="eyebrow">What you mean to me</p>
+        <h2 class="photo-q">You are my<br><em>home</em></h2>
+        <div class="photo-hr"></div>
+        <p class="photo-note">Home is not a place — it's a feeling. And every time I'm with you, I feel it. You are the safest, warmest, most beautiful place I have ever known. I don't want to be anywhere else.</p>
+      </div>
+    </div>
+
+    <!-- 4 – PHOTO 3 -->
+    <div class="page photo-page" data-page="3">
+      <div class="photo-frame">
+        <img src="photo3.jpg" alt="Photo 3" onerror="this.style.display='none'" />
+        <div class="ph-empty"><span>📷</span><span>Photo 3</span></div>
+        <span class="ph-num">03 / 06</span>
+      </div>
+      <div class="photo-copy">
+        <p class="eyebrow">Every little moment</p>
+        <h2 class="photo-q">I miss you<br>in <em>everything</em></h2>
+        <div class="photo-hr"></div>
+        <p class="photo-note">I miss you in songs, in silence, in the middle of a laugh. I miss you when something good happens and you're the first person I want to tell. You are woven into every part of my day — and I feel your absence in all of them.</p>
+      </div>
+    </div>
+
+    <!-- 5 – PHOTO 4 -->
+    <div class="page photo-page" data-page="4">
+      <div class="photo-frame">
+        <img src="photo4.jpg" alt="Photo 4" onerror="this.style.display='none'" />
+        <div class="ph-empty"><span>📷</span><span>Photo 4</span></div>
+        <span class="ph-num">04 / 06</span>
+      </div>
+      <div class="photo-copy">
+        <p class="eyebrow">What I should have said</p>
+        <h2 class="photo-q">I'm sorry —<br><em>truly</em> sorry</h2>
+        <div class="photo-hr"></div>
+        <p class="photo-note">I know sorry isn't enough on its own. But I want you to know that I see exactly where I went wrong, and I carry it every single day. You deserved better — and I am willing to spend every day becoming that person for you.</p>
+      </div>
+    </div>
+
+    <!-- 6 – PHOTO 5 -->
+    <div class="page photo-page" data-page="5">
+      <div class="photo-frame">
+        <img src="photo5.jpg" alt="Photo 5" onerror="this.style.display='none'" />
+        <div class="ph-empty"><span>📷</span><span>Photo 5</span></div>
+        <span class="ph-num">05 / 06</span>
+      </div>
+      <div class="photo-copy">
+        <p class="eyebrow">What I choose every day</p>
+        <h2 class="photo-q">It's always<br>been <em>you</em></h2>
+        <div class="photo-hr"></div>
+        <p class="photo-note">Not because I have to — because I want to. Every single morning I choose you. Every time things get hard, I choose you. There is no version of my future that feels right without you in it. You are my choice, always.</p>
+      </div>
+    </div>
+
+    <!-- 7 – PHOTO 6 -->
+    <div class="page photo-page" data-page="6">
+      <div class="photo-frame">
+        <img src="photo6.jpg" alt="Photo 6" onerror="this.style.display='none'" />
+        <div class="ph-empty"><span>📷</span><span>Photo 6</span></div>
+        <span class="ph-num">06 / 06</span>
+      </div>
+      <div class="photo-copy">
+        <p class="eyebrow">Come back to me</p>
+        <h2 class="photo-q">Give us one<br>more <em>chance</em></h2>
+        <div class="photo-hr"></div>
+        <p class="photo-note">I'm not asking you to forget. I'm asking you to let me prove that what we have is worth more than one mistake. We were something real — something rare. Please don't let that go. I love you, Doha. More than any word I know.</p>
+      </div>
+    </div>
+
+    <!-- 8 – LETTER -->
+    <div class="page" data-page="7">
+      <div class="letter-wrap">
+        <p class="eyebrow" style="text-align:left;margin-bottom:28px;">From Omar, to Doha</p>
+        <div class="letter-card">
+          <p class="letter-date" id="letterDate">Loading…</p>
+          <div class="letter-body">
+            <p>Doha, <em>my love</em> — I have been trying to find the right words for so long, and the truth is there are none big enough. So I'll just say what's real: losing you is the hardest thing I have ever felt.</p>
+            <p>You are not just someone I love — you are the person who made me believe in what love actually means. The way you care, the way you laugh, the way you make even a quiet evening feel like the best night of my life — <em>that's you, Doha.</em> That's what I threw away, and I will never forgive myself for it.</p>
+            <p>I am not here to make excuses. I am here because I am completely, hopelessly certain that what we had was once in a lifetime. And I refuse to accept that it's over without letting you know exactly how I feel.</p>
+            <p>I love you. I choose you. I will spend every day showing you that you were never wrong to trust me — <em>if you just give me the chance.</em></p>
+            <p>Come back to me. Please. ❤️</p>
+          </div>
+          <div class="letter-sign">Forever yours, Omar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9 – FINALE -->
+    <div class="page" data-page="8">
+      <div class="finale-ring"></div>
+      <span class="finale-heart">❤️</span>
+      <h2 class="finale-names">Omar &amp; Doha</h2>
+      <p class="finale-sub">Always &nbsp;·&nbsp; Forever &nbsp;·&nbsp; Together</p>
+      <p class="finale-days" id="daysNum">…</p>
+      <p class="finale-label">days of loving you</p>
+    </div>
+
+  </div>
+
+  <audio id="bgAudio" src="song.mp3" loop preload="auto"></audio>
+
+  <script>
+    /* CURSOR */
+    const cur=document.getElementById('cursor'), cring=document.getElementById('cring');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){
+      rx+=(mx-rx)*.18; ry+=(my-ry)*.18;
+      cur.style.left=mx+'px'; cur.style.top=my+'px';
+      cring.style.left=rx+'px'; cring.style.top=ry+'px';
+      requestAnimationFrame(tick);
+    })();
+
+    /* PARTICLES */
+    const syms=['❤','♡','·','✦','✧','❧'];
+    const pC=document.getElementById('particles');
+    for(let i=0;i<24;i++){
+      const p=document.createElement('span'); p.className='pt';
+      p.textContent=syms[i%syms.length];
+      p.style.cssText=`left:${Math.random()*100}%;font-size:${8+Math.random()*10}px;animation-duration:${9+Math.random()*12}s;animation-delay:${Math.random()*14}s;color:${Math.random()>.5?'#e8a4b0':'#c9a96e'};`;
+      pC.appendChild(p);
+    }
+
+    /* DATES — together since October 2023 */
+    const START = new Date('2023-10-01');
+    const now = new Date();
+    document.getElementById('daysNum').textContent = Math.floor((now - START) / 86400000).toLocaleString();
+    document.getElementById('letterDate').textContent = now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+    /* PAGES */
+    const pages=[...document.querySelectorAll('.page')];
+    const total=pages.length;
+    let current=0, busy=false, autoPaused=false;
+
+    // Durations per page
+    const PAGE_DURATIONS = [
+      3000,    // hero — quick splash
+      9000,    // photo 1
+      9000,    // photo 2
+      9000,    // photo 3
+      9000,    // photo 4
+      9000,    // photo 5
+      9000,    // photo 6
+      22000,   // letter — long read
+      9999999  // finale — stays forever
+    ];
+
+    const dotsWrap=document.getElementById('nav-dots');
+    pages.forEach((_,i)=>{
+      const d=document.createElement('button');
+      d.className='ndot'+(i===0?' on':'');
+      d.addEventListener('click',()=>{ autoPaused=false; goTo(i); });
+      dotsWrap.appendChild(d);
+    });
+    const dots=[...dotsWrap.querySelectorAll('.ndot')];
+    const btnPrev=document.getElementById('btnPrev');
+    const btnNext=document.getElementById('btnNext');
+    const pauseBadge=document.getElementById('pause-badge');
+
+    function syncUI(){
+      dots.forEach((d,i)=>d.classList.toggle('on',i===current));
+      btnPrev.disabled=current===0;
+      btnNext.disabled=current===total-1;
+    }
+
+    function goTo(n){
+      if(busy||n===current||n<0||n>=total) return;
+      busy=true; stopTimer();
+      const dir=n>current?1:-1;
+      const out=pages[current], inn=pages[n];
+      out.style.transition='opacity .55s var(--ease), transform .55s var(--ease)';
+      out.style.opacity='0';
+      out.style.transform=`translateY(${dir>0?'-30px':'30px'})`;
+      inn.style.transition='none';
+      inn.style.opacity='0';
+      inn.style.transform=`translateY(${dir>0?'30px':'-30px'})`;
+      inn.classList.add('active');
+      setTimeout(()=>{
+        out.classList.remove('active');
+        out.style.transition=out.style.transform=out.style.opacity='';
+        out.style.pointerEvents='none';
+        inn.style.transition='opacity .65s var(--ease), transform .65s var(--ease)';
+        inn.style.opacity='1';
+        inn.style.transform='translateY(0)';
+        current=n; syncUI();
+        setTimeout(()=>{ inn.style.transition=''; busy=false; if(!autoPaused) startTimer(); },700);
+      },560);
+    }
+
+    btnPrev.addEventListener('click',()=>{ autoPaused=false; goTo(current-1); });
+    btnNext.addEventListener('click',()=>{ autoPaused=false; goTo(current+1); });
+
+    document.addEventListener('keydown',e=>{
+      if(e.key==='ArrowDown'||e.key==='ArrowRight'){ autoPaused=false; goTo(current+1); }
+      if(e.key==='ArrowUp'||e.key==='ArrowLeft'){   autoPaused=false; goTo(current-1); }
+      if(e.key===' '){ e.preventDefault(); toggleAutoPause(); }
+    });
+
+    let wLock=false;
+    document.addEventListener('wheel',e=>{
+      if(wLock) return; wLock=true;
+      autoPaused=false;
+      goTo(e.deltaY>0?current+1:current-1);
+      setTimeout(()=>wLock=false,1400);
+    },{passive:true});
+
+    let ty0=0;
+    document.addEventListener('touchstart',e=>{ty0=e.touches[0].clientY;},{passive:true});
+    document.addEventListener('touchend',e=>{
+      const dy=ty0-e.changedTouches[0].clientY;
+      if(Math.abs(dy)>45){ autoPaused=false; goTo(dy>0?current+1:current-1); }
+    });
+
+    syncUI();
+
+    /* TIMER */
+    let timerRAF=null, timerStart=null;
+
+    function startTimer(){
+      stopTimer();
+      const dur=PAGE_DURATIONS[current];
+      if(!dur||dur>999999) return;
+      timerStart=performance.now();
+      function tick(now){
+        if(now-timerStart>=dur){ goTo(current+1); }
+        else { timerRAF=requestAnimationFrame(tick); }
+      }
+      timerRAF=requestAnimationFrame(tick);
+    }
+
+    function stopTimer(){
+      if(timerRAF){ cancelAnimationFrame(timerRAF); timerRAF=null; }
+    }
+
+    function toggleAutoPause(){
+      autoPaused=!autoPaused;
+      pauseBadge.classList.toggle('show',autoPaused);
+      autoPaused ? stopTimer() : startTimer();
+    }
+
+    /* MUSIC */
+    const audio=document.getElementById('bgAudio');
+    const pillDisc=document.getElementById('pillDisc');
+    const pillBtn=document.getElementById('pillBtn');
+    const pill=document.getElementById('music-pill');
+    let musicPlaying=false;
+
+    function setPlaying(val){
+      musicPlaying=val;
+      pillDisc.classList.toggle('playing',val);
+      pillBtn.innerHTML=val?'&#9646;&#9646;':'&#9654;';
+    }
+
+    function tryPlay(){
+      if(!audio.src||audio.src===location.href) return;
+      audio.play().then(()=>setPlaying(true)).catch(()=>setPlaying(false));
+    }
+
+    pillBtn.addEventListener('click',e=>{
+      e.stopPropagation();
+      musicPlaying ? (audio.pause(), setPlaying(false)) : tryPlay();
+    });
+    pill.addEventListener('click',e=>{
+      if(e.target===pillBtn) return;
+      musicPlaying ? (audio.pause(), setPlaying(false)) : tryPlay();
+    });
+
+    document.getElementById('startBtn').addEventListener('click',()=>{
+      document.getElementById('start-overlay').classList.add('hidden');
+      tryPlay();
+      startTimer();
+    });
+  </script>
+</body>
+</html>
